@@ -1,4 +1,4 @@
-name: Python application
+name: investofarm_backend
 
 on:
   push:
