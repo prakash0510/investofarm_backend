@@ -1,0 +1,13 @@
+uvicorn
+fastapi
+sqlalchemy
+alembic
+pydantic
+pymysql
+passlib
+pyjwt
+python-dotenv
+mysql-connector-python
+email-validator
+bcrypt
+mangum

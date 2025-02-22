@@ -1,0 +1,18 @@
+public_html/api/
+Upload the following files & folders from fastapi_backend/ to public_html/api/ on your server:
+
+✅ Folders to Upload
+
+app/
+schemas/
+models/
+services/
+core/
+✅ Files to Upload
+
+main.py
+requirements.txt
+.env
+passenger_wsgi.py
+gunicorn_conf.py
+run.sh (optional)
