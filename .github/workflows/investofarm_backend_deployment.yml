@@ -80,12 +80,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Upload Artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        name: investofarm_backend  # the name of the artifact
-        path: build/app
-
   #
   deploy:
     needs: build
