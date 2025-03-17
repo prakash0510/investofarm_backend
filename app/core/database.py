@@ -29,6 +29,7 @@ class Database:
 
 # Dependency to get the database connection
 def get_db():
+    print(f"Database connecting started.....")
     """Dependency for FastAPI routes to get a database connection."""
     db = Database.get_connection()
     try:
