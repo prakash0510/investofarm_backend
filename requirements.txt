@@ -11,3 +11,6 @@ mysql-connector-python
 email-validator
 bcrypt
 mangum
+python-multipart
+pydantic-settings
+cryptography
