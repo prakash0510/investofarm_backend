@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.routes import users, notification, project
+from app.api.routes import users, notification, project, feedback
 
 app = FastAPI()
 
@@ -11,3 +11,4 @@ def home():
 
 app.include_router(notification.router)
 app.include_router(project.router)
+app.include_router(feedback.router)

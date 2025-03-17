@@ -9,7 +9,7 @@ from app.core.config import settings
 from fastapi import FastAPI, Depends, HTTPException, Header, APIRouter, Response, Request, APIRouter, HTTPException, Depends, Header
 import json
 from cryptography.fernet import Fernet
-from app.services.auth_service import decrypt_data, encrypt_data
+from app.services.auth_service import decrypt_data, encrypt_data, decode_jwt, token_blacklist
 
 
 router = APIRouter()
@@ -128,21 +128,25 @@ def login(user: dict, response: Response, db=Depends(get_db)):
 
 
 
-@router.post("/refresh-token")
-def refresh_token(request: Request):
-    refresh_token = request.cookies.get("refresh_token")
-    if not refresh_token:
-        raise HTTPException(status_code=401, detail="Refresh token missing")
 
-    try:
-        decoded_token = jwt.decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
-        user_data = decrypt_data(decoded_token["data"])
-        new_access_token = create_jwt_token(user_data["id"], user_data.get("email"))
-        return {"access_token": new_access_token}
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Refresh token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
+@router.get("/logout")
+def logout(request: Request):
+    auth_header = request.headers.get("Authorization")
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authorization token missing")
+
+    token = auth_header.split(" ")[1]  
+
+    # Decode token
+    payload = decode_jwt(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    token_blacklist(token)
+
+
+    return {"success": True, "message": "Logged out successfully"}
 
 
 

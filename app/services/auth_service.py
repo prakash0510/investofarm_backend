@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import json
 from cryptography.fernet import Fernet
+from app.core.config import settings
 
 
 ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY") or Fernet.generate_key().decode()
@@ -12,6 +13,7 @@ fernet = Fernet(ENCRYPTION_KEY.encode())
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+token_blacklist_set = set()
 
 def auth_required(authorization: str = Header(None)):
     if not authorization:
@@ -19,6 +21,8 @@ def auth_required(authorization: str = Header(None)):
 
     try:
         token = authorization.split(" ")[1]
+        if token in token_blacklist_set:
+            raise HTTPException(status_code=401, detail="Token has been invalidated")
         decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return decoded_token
         # return decrypt_data(decoded_token["data"])
@@ -36,3 +40,25 @@ def decrypt_data(encrypted_data: str) -> dict:
 def encrypt_data(data: dict) -> str:
     json_data = json.dumps(data).encode()
     return fernet.encrypt(json_data).decode()
+
+
+
+def token_blacklist(token: str):
+    """
+    Decodes JWT token and returns the payload.
+    """
+    try:
+       token_blacklist_set.add(token)
+    except Exception as e:
+        return None
+
+
+def decode_jwt(token: str):
+    """
+    Decodes JWT token and returns the payload.
+    """
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        return payload
+    except Exception as e:
+        return None
