@@ -23,6 +23,10 @@ fastapi_backed/
 │   │   ├── __init__.py
 │   │   ├── user_service.py
 │   │   ├── item_service.py
+│    ├── templates/
+│   │   ├
+│   │   ├── user_service.py
+│   │   ├── otp_email_templates.html
 │   ├── main.py
 │   ├── __init__.py
 │── env/                 # Virtual environment (not tracked in Git)

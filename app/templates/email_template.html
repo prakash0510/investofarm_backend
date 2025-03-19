@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Email Template</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: rgb(35, 118, 106);
+            color: #ffffff;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .header img {
+            width: 100px; /* Adjust the size of the logo */
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .header p {
+            margin: 10px 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .otp-section {
+            background-color: rgba(35, 118, 106, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .otp-section h2 {
+            font-size: 22px;
+            color: rgb(35, 118, 106);
+            margin: 0 0 10px 0;
+        }
+        .otp-code {
+            font-size: 36px;
+            font-weight: bold;
+            color: rgb(35, 118, 106);
+            margin: 10px 0;
+            letter-spacing: 4px;
+        }
+        .otp-section p {
+            font-size: 14px;
+            color: #555555;
+            margin: 10px 0;
+        }
+        .social-icons {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .social-icons a {
+            margin: 0 15px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        .social-icons a:hover {
+            transform: scale(1.1);
+        }
+        .social-icons img {
+            width: 40px;
+            height: 40px;
+        }
+        .footer {
+            background-color: rgb(35, 118, 106);
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .header p {
+                font-size: 14px;
+            }
+            .content {
+                padding: 20px 15px;
+            }
+            .otp-section h2 {
+                font-size: 20px;
+            }
+            .otp-code {
+                font-size: 28px;
+                letter-spacing: 3px;
+            }
+            .otp-section p {
+                font-size: 13px;
+            }
+            .social-icons img {
+                width: 35px;
+                height: 35px;
+            }
+            .footer {
+                padding: 15px;
+                font-size: 12px;
+            }
+        }
+
+        @media only screen and (max-width: 400px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            .header p {
+                font-size: 13px;
+            }
+            .otp-section h2 {
+                font-size: 18px;
+            }
+            .otp-code {
+                font-size: 24px;
+                letter-spacing: 2px;
+            }
+            .otp-section p {
+                font-size: 12px;
+            }
+            .social-icons img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="https://www.investofarms.com/email_logo.svg" alt="InvestoFarms">
+            <h1>Your OTP is Here</h1>
+            <p>Forgot Password One Time Password</p>
+        </div>
+
+        <div class="content">
+            <p>Hello there,</p>
+            <p>We’ve generated a One-Time Password (OTP) for your account verification. Please use the code below to complete the process.</p>
+
+            <!-- OTP Section -->
+            <div class="otp-section">
+                <h2>Your One-Time Password</h2>
+                <div class="otp-code">{{ otp }}</div>
+                <p>This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
+            </div>
+
+            <p>If you didn’t request this OTP, please ignore this email or contact our support team immediately.</p>
+        </div>
+
+        <!-- Social Icons Section -->
+        <div class="social-icons">
+            <p>Follow us on social media:</p>
+            <a href="https://www.facebook.com/investofarms/" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">
+            </a>
+            <a href="https://www.linkedin.com/company/investofarms/" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+            </a>
+            <a href="https://www.instagram.com/investo.farms/" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram">
+            </a>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p>If you have any questions, feel free to <a href="mailto:support@yourcompany.com">contact us</a>.</p>
+            <p>&copy; 2024 InvestoFarms Patners Pvt. Ltd. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

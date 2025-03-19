@@ -14,3 +14,4 @@ mangum
 python-multipart
 pydantic-settings
 cryptography
+jinja2>=3.0
