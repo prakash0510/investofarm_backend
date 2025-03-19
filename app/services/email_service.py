@@ -56,7 +56,7 @@ async def sent_otp_email(email,trmplate=None):
             server.starttls()  
             server.login(sender_email, sender_password)  
             server.sendmail(sender_email, receiver_email, msg.as_string())  
-        return f"Email sent successfully! OTP: {otp}"
+        return {"data":"Email sent successfully!"}
     except Exception as e:
         return f"Error: {e}"
     
