@@ -82,7 +82,7 @@ def signup(user: UserSignupRequest, db=Depends(get_db)):
 
         insert_query = """
             INSERT INTO User (Name, Email, Mobile_Number, City, State, Pincode, Password, Is_Active)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         values = (
             user.Name, user.Email, user.Mobile_Number, user.City, user.State,
