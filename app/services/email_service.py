@@ -5,9 +5,13 @@ import os
 from pathlib import Path
 import random
 from jinja2 import Template
+from cachetools import TTLCache
+from fastapi import FastAPI, HTTPException
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent  
 TEMPLATE_DIR = BASE_DIR / "templates"
+otp_cache = TTLCache(maxsize=100, ttl=660)
 
 def add_otp(file_path, otp):
     try:
@@ -55,9 +59,23 @@ async def sent_otp_email(email,trmplate=None):
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()  
             server.login(sender_email, sender_password)  
-            server.sendmail(sender_email, receiver_email, msg.as_string())  
+            server.sendmail(sender_email, receiver_email, msg.as_string()) 
+
+        otp_cache[receiver_email] = otp
+        print(f"Cache after storing OTP: {otp_cache}")
         return {"data":"Email sent successfully!"}
     except Exception as e:
         return f"Error: {e}"
     
     
+
+async def verify_otp(email: str, otp: str):
+    stored_otp = otp_cache.get(email)
+    print(f"Stored OTP: {stored_otp}, Provided OTP: {otp}")
+    if not stored_otp:
+        raise HTTPException(status_code=400, detail="OTP expired or not found")
+    if str(stored_otp) != str(otp):
+        raise HTTPException(status_code=400, detail="Invalid OTP")
+    
+    del otp_cache[email]
+    return {"message": "OTP verified successfully"}

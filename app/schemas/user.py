@@ -37,38 +37,41 @@
 #     Pincode: str
 
 
-from pydantic import BaseModel, EmailStr
-from fastapi import Form
+from pydantic import BaseModel, EmailStr, Field, validator
+from fastapi import Form, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+import re
 
 class UserSignupRequest(BaseModel):
-    Name: str
-    Email: EmailStr
-    Mobile_Number: int
-    City: str
-    State: str
-    Pincode: int
-    Password: str
+    Name: str = Field(..., min_length=2, max_length=50, example="John Doe")
+    Email: EmailStr = Field(..., example="user@example.com")
+    Mobile_Number: str = Field(..., pattern=r"^[6-9]\d{9}$", example="9876543210") 
+    City: str = Field(..., min_length=2, max_length=50, example="Bangalore")
+    State: str = Field(..., min_length=2, max_length=50, example="Karnataka")
+    Pincode: str = Field(..., pattern=r"^\d{6}$", example="400001")  
+    Password: str = Field(..., min_length=6, max_length=20, example="Test@123")
 
-    @classmethod
-    def as_form(
-        cls,
-        Name: str = Form(...),
-        Email: EmailStr = Form(...),
-        Mobile_Number: int = Form(...),
-        City: str = Form(...),
-        State: str = Form(...),
-        Pincode: int = Form(...),
-        Password: str = Form(...)
-    ):
-        return cls(
-            Name=Name,
-            Email=Email,
-            Mobile_Number=Mobile_Number,
-            City=City,
-            State=State,
-            Pincode=Pincode,
-            Password=Password
-        )
+
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    for error in errors:
+        field = error["loc"][-1]
+        if field == "Mobile_Number":
+            return JSONResponse(
+                status_code=400,
+                content={"detail": "Invalid phone number. Please enter a valid 10-digit number starting with 6-9."},
+            )
+        elif field == "Pincode":
+            return JSONResponse(
+                status_code=400,
+                content={"detail": "Invalid Pincode. It must be a 6-digit number."},
+            )
+    return JSONResponse(
+        status_code=400,
+        content={"detail": "Invalid input. Please check your request data."},
+    )
 
 class UserLoginRequest(BaseModel):
     Email: EmailStr
@@ -95,6 +98,13 @@ class User(BaseModel):
     Email: EmailStr
 
     class Config:
-        from_attributes = True  # Allows ORM model conversion
+        from_attributes = True  
+
+class UpdatePasswordRequest(BaseModel):
+    email: str
+    password: str
+
+
+
 
 

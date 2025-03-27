@@ -10,6 +10,8 @@ from fastapi import FastAPI, Depends, HTTPException, Header, APIRouter, Response
 import json
 from cryptography.fernet import Fernet
 from app.services.auth_service import decrypt_data, encrypt_data, decode_jwt, token_blacklist
+from app.schemas.user import UpdatePasswordRequest, UserSignupRequest
+import mysql.connector
 
 
 router = APIRouter()
@@ -21,14 +23,14 @@ ACCESS_TOKEN_EXPIRE_DAYS = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 
-class UserSignupRequest(BaseModel):
-    Name: str
-    Email: EmailStr
-    Mobile_Number: int
-    City: str
-    State: str
-    Pincode: int
-    Password: str
+# class UserSignupRequest(BaseModel):
+#     Name: str
+#     Email: EmailStr
+#     Mobile_Number: int
+#     City: str
+#     State: str
+#     Pincode: int
+#     Password: str
 
 class UserLoginRequest(BaseModel):
     Email: EmailStr
@@ -95,6 +97,13 @@ def signup(user: UserSignupRequest, db=Depends(get_db)):
         cursor.close()
         return {"message": "User created successfully", "user": user.dict()}
 
+    except mysql.connector.errors.IntegrityError as e:
+        if "Duplicate entry" in str(e):
+            if "Mobile_Number" in str(e):
+                raise HTTPException(status_code=400, detail="Mobile Number already exists")
+            elif "Email" in str(e):
+                raise HTTPException(status_code=400, detail="Email already exists")
+        raise HTTPException(status_code=500, detail="Signup failed due to a server error")
     except Exception as e:
         db.rollback()  
         raise HTTPException(status_code=500, detail=f"Signup failed: {str(e)}")
@@ -147,6 +156,26 @@ def logout(request: Request):
 
 
     return {"success": True, "message": "Logged out successfully"}
+
+
+
+@router.put("/update-password")
+def update_password(data: UpdatePasswordRequest, db=Depends(get_db)):
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT ID, Password FROM User WHERE Email = %s", (data.email,))
+    user_record = cursor.fetchone()
+
+    if not user_record:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    hashed_new_password = hash_password(data.password)
+
+    cursor.execute("UPDATE User SET Password = %s WHERE ID = %s", (hashed_new_password, user_record["ID"]))
+    db.commit()
+    cursor.close()
+
+    return {"message": "Password updated successfully"}
 
 
 

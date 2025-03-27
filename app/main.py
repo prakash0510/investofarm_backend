@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import users, notification, project, feedback, sent_email
+from fastapi.exceptions import RequestValidationError
+from app.schemas.user import validation_exception_handler
 
 app = FastAPI()
 origins = [
@@ -17,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 @app.get("/")
 def home():
