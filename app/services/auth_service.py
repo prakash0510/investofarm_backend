@@ -24,7 +24,9 @@ def auth_required(authorization: str = Header(None)):
         if token in token_blacklist_set:
             raise HTTPException(status_code=401, detail="Token has been invalidated")
         decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return decoded_token
+        decrypted_data = decrypt_data(decoded_token["data"])
+        user_id = decrypted_data.get("id")
+        return decrypted_data
         # return decrypt_data(decoded_token["data"])
 
     except jwt.ExpiredSignatureError:
