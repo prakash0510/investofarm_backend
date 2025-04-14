@@ -12,7 +12,8 @@ from cryptography.fernet import Fernet
 from app.services.auth_service import decrypt_data, encrypt_data, decode_jwt, token_blacklist
 from app.schemas.user import UpdatePasswordRequest, UserSignupRequest
 import mysql.connector
-
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
 
 router = APIRouter()
 
@@ -179,3 +180,64 @@ def update_password(data: UpdatePasswordRequest, db=Depends(get_db)):
 
 
 
+@router.post("/google-login")
+async def google_login(request: Request, response: Response, db=Depends(get_db)):
+    try:
+        body = await request.json()
+        token = body.get("id_token")
+
+        if not token:
+            raise HTTPException(status_code=400, detail="Missing id_token")
+
+        # Specify the CLIENT_ID of the app that accesses the backend
+        # CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+        CLIENT_ID = "220724747894-9rns853pmgavt1ik84r66caq4qng2k84.apps.googleusercontent.com"
+
+        # Verify the token
+        idinfo = id_token.verify_oauth2_token(token, grequests.Request(), CLIENT_ID)
+
+        # Extract email and user info
+        email = idinfo['email']
+        name = idinfo.get('name', '')
+        sub = idinfo['sub']
+
+        # Check if user exists
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT ID, Email FROM User WHERE Email = %s", (email,))
+        user_record = cursor.fetchone()
+
+        if not user_record:
+            # If not found, create a new user
+            cursor.execute(
+                "INSERT INTO User (Name, Email, Is_Active) VALUES (%s, %s, %s)",
+                (name, email, True)
+            )
+            db.commit()
+            user_id = cursor.lastrowid
+        else:
+            user_id = user_record["ID"]
+
+        cursor.close()
+
+        access_token = create_jwt_token(user_id, email)
+        refresh_token = create_refresh_token(user_id)
+
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=True,
+            samesite="Lax"
+        )
+
+        return {
+            "message": "Google login successful",
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "user": {"id": user_id, "email": email}
+        }
+
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid Google token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
