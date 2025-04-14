@@ -116,7 +116,7 @@ def signup(user: UserSignupRequest, db=Depends(get_db)):
 @router.post("/login")
 def login(user: dict, response: Response, db=Depends(get_db)):
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT ID, Name, Email, Password FROM User WHERE Email = %s", (user["Email"],))
+    cursor.execute("SELECT * FROM User WHERE Email = %s", (user["Email"],))
     user_record = cursor.fetchone()
     cursor.close()
 
@@ -125,6 +125,9 @@ def login(user: dict, response: Response, db=Depends(get_db)):
 
     access_token = create_jwt_token(user_record["ID"], user_record["Email"])
     refresh_token = create_refresh_token(user_record["ID"])
+    user_record.pop("Password", None)
+    user_record.pop("Is_Active", None)
+    user_record.pop("Role", None)
 
     response.set_cookie(
         key="refresh_token",
@@ -134,7 +137,7 @@ def login(user: dict, response: Response, db=Depends(get_db)):
         samesite="Lax"
     )
 
-    return {"message": "Login successful", "access_token": access_token, "refresh_token":refresh_token,"user": {"id": user_record["ID"], "email": user_record["Email"]}}
+    return {"message": "Login successful", "access_token": access_token, "refresh_token":refresh_token,"user": user_record}
 
 
 
