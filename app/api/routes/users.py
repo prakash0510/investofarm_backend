@@ -208,10 +208,19 @@ async def google_login(request: Request, response: Response, db=Depends(get_db))
 
         if not user_record:
             # If not found, create a new user
-            cursor.execute(
-                "INSERT INTO User (Name, Email, Is_Active) VALUES (%s, %s, %s)",
-                (name, email, True)
+            insert_query = """
+            INSERT INTO User (Name, Email, Mobile_Number, City, State, Pincode, Password, Is_Active)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            values = (
+                name, email, "", "", "",
+                "", "", True  
             )
+            cursor.execute(insert_query, values)
+            # cursor.execute(
+            #     "INSERT INTO User (Name, Email, Is_Active) VALUES (%s, %s, %s)",
+            #     (name, email, True)
+            # )
             db.commit()
             user_id = cursor.lastrowid
         else:
