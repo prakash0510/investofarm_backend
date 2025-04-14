@@ -200,51 +200,52 @@ async def google_login(request: Request, response: Response, db=Depends(get_db))
         email = idinfo['email']
         name = idinfo.get('name', '')
         sub = idinfo['sub']
+        return {"email": f"{idinfo['email']}","name":f"{idinfo.get('name', '')}"}
 
         # Check if user exists
-        cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT ID, Email FROM User WHERE Email = %s", (email,))
-        user_record = cursor.fetchone()
+        # cursor = db.cursor(dictionary=True)
+        # cursor.execute("SELECT ID, Email FROM User WHERE Email = %s", (email,))
+        # user_record = cursor.fetchone()
 
-        if not user_record:
-            # If not found, create a new user
-            insert_query = """
-            INSERT INTO User (Name, Email, Mobile_Number, City, State, Pincode, Password, Is_Active)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """
-            values = (
-                name, email, "", "", "",
-                "", "", True  
-            )
-            cursor.execute(insert_query, values)
-            # cursor.execute(
-            #     "INSERT INTO User (Name, Email, Is_Active) VALUES (%s, %s, %s)",
-            #     (name, email, True)
-            # )
-            db.commit()
-            user_id = cursor.lastrowid
-        else:
-            user_id = user_record["ID"]
+        # if not user_record:
+        #     # If not found, create a new user
+        #     insert_query = """
+        #     INSERT INTO User (Name, Email, Mobile_Number, City, State, Pincode, Password, Is_Active)
+        #     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        #     """
+        #     values = (
+        #         name, email, "", "", "",
+        #         "", "", True  
+        #     )
+        #     cursor.execute(insert_query, values)
+        #     # cursor.execute(
+        #     #     "INSERT INTO User (Name, Email, Is_Active) VALUES (%s, %s, %s)",
+        #     #     (name, email, True)
+        #     # )
+        #     db.commit()
+        #     user_id = cursor.lastrowid
+        # else:
+        #     user_id = user_record["ID"]
 
-        cursor.close()
+        # cursor.close()
 
-        access_token = create_jwt_token(user_id, email)
-        refresh_token = create_refresh_token(user_id)
+        # access_token = create_jwt_token(user_id, email)
+        # refresh_token = create_refresh_token(user_id)
 
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            secure=True,
-            samesite="Lax"
-        )
+        # response.set_cookie(
+        #     key="refresh_token",
+        #     value=refresh_token,
+        #     httponly=True,
+        #     secure=True,
+        #     samesite="Lax"
+        # )
 
-        return {
-            "message": "Google login successful",
-            "access_token": access_token,
-            "refresh_token": refresh_token,
-            "user": {"id": user_id, "email": email}
-        }
+        # return {
+        #     "message": "Google login successful",
+        #     "access_token": access_token,
+        #     "refresh_token": refresh_token,
+        #     "user": {"id": user_id, "email": email}
+        # }
 
     except ValueError:
         raise HTTPException(status_code=401, detail="Invalid Google token")
