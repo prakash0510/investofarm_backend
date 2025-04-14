@@ -10,7 +10,8 @@ from fastapi import FastAPI, Depends, HTTPException, Header, APIRouter, Response
 import json
 from cryptography.fernet import Fernet
 from app.services.auth_service import decrypt_data, encrypt_data, decode_jwt, token_blacklist
-from app.schemas.user import UpdatePasswordRequest, UserSignupRequest
+from app.services.auth_service import auth_required
+from app.schemas.user import AddBankAccountdRequest, AddNomineedRequest, UpdatePasswordRequest, UserSignupRequest
 import mysql.connector
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
@@ -181,6 +182,49 @@ def update_password(data: UpdatePasswordRequest, db=Depends(get_db)):
 
     return {"message": "Password updated successfully"}
 
+
+@router.post("/add-bank-details")
+def add_bank_details(data: AddBankAccountdRequest, user_data: dict = Depends(auth_required), db=Depends(get_db)):
+    try:
+        cursor = db.cursor(dictionary=True)
+
+        insert_query = """
+                INSERT INTO Wallet (User_ID, Bank_Name, IFSC_Code, Account_Number)
+                VALUES (%s, %s, %s, %s)
+        """
+        values = (data.User_ID, data.Bank_Name, data.IFSC_Code, data.Account_Number)
+        cursor.execute(insert_query, values)
+
+        db.commit()
+
+        return {"message": "Bank Account added successfully"}
+    except Exception as e:
+        db.rollback()  
+        return {"data":f"Failed to add bank account: {str(e)}"}
+
+
+@router.post("/add-nominee-details")
+def add_bank_details(data: AddNomineedRequest, user_data: dict = Depends(auth_required), db=Depends(get_db)):
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM Nominee_Details WHERE Unique_ID = %s", (data.Unique_ID,))
+        existing_data = cursor.fetchone()
+        if existing_data:
+            return {"message": f"Nominee already exists with this Unique ID {data.Unique_ID}"}
+
+        insert_query = """
+                INSERT INTO Nominee_Details (User_ID, Name, Relation, Unique_ID)
+                VALUES (%s, %s, %s, %s)
+        """
+        values = (data.User_ID, data.Name, data.Relation, data.Unique_ID)
+        cursor.execute(insert_query, values)
+
+        db.commit()
+
+        return {"message": "Nominee added successfully"}
+    except Exception as e:
+        db.rollback()  
+        return {"data":f"Failed to add Nominee: {str(e)}"}
 
 
 @router.post("/google-login")

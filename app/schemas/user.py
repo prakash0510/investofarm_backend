@@ -105,6 +105,19 @@ class UpdatePasswordRequest(BaseModel):
     password: str
 
 
+class AddBankAccountdRequest(BaseModel):
+    User_ID: int
+    Bank_Name: str
+    Account_Number: str
+    IFSC_Code: str
+
+class AddNomineedRequest(BaseModel):
+    User_ID: int
+    Name: str
+    Relation: str
+    Unique_ID: str
+
+
 
 
 
