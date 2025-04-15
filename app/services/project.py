@@ -25,4 +25,4 @@ async def get_all_projects(user_id, db_func: Session = Depends(get_db)):
             grouped[project_name] = []
         grouped[project_name].append(row)
 
-    return {"projects": projects, "news": news, "crops": crops, "crop_expenses": crop_expenses,"transactions":grouped,"total_invested_amount": total_completed_amount}  
+    return {"projects": projects, "news": news, "crops": crops, "crop_expenses": crop_expenses,"transactions":grouped,"total_invested_amount": total_completed_amount,"all_transactions": transactions}  
