@@ -80,7 +80,7 @@ def signup(user: UserSignupRequest, db=Depends(get_db)):
         existing_user = cursor.fetchone()
 
         if existing_user:
-            raise HTTPException(status_code=400, detail="Email already registered")
+            return {"data":"Email already registered"}
 
         hashed_password = hash_password(user.Password)
 
@@ -102,9 +102,9 @@ def signup(user: UserSignupRequest, db=Depends(get_db)):
     except mysql.connector.errors.IntegrityError as e:
         if "Duplicate entry" in str(e):
             if "Mobile_Number" in str(e):
-                raise HTTPException(status_code=400, detail="Mobile Number already exists")
+                return {"data":"Mobile already registered"}
             elif "Email" in str(e):
-                raise HTTPException(status_code=400, detail="Email already exists")
+                return {"data":"Email already Exists"}
         raise HTTPException(status_code=500, detail="Signup failed due to a server error")
     except Exception as e:
         db.rollback()  
