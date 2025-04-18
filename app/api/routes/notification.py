@@ -13,4 +13,4 @@ def get_notifications(user_data: dict = Depends(auth_required), db_func=Depends(
     notifications = cursor.fetchall()
     if notifications:
         return {"data": {"notifications": notifications}}
-    return {"data": []}
+    return {"data": {}}
