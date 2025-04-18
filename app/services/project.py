@@ -50,4 +50,4 @@ async def get_all_projects(user_id, db_func: Session = Depends(get_db)):
     transactions_list = [{project: items} for project, items in grouped.items()]
     
 
-    return {"projects": projects, "news": news, "crops": crops, "crop_expenses": crop_expenses,"transactions":transactions_list,"total_invested_amount": total_completed_amount,"all_transactions": transactions,"invested_project": project_wise_totals_list}  
+    return {"projects": projects, "news": news, "crops": crops, "crop_expenses": crop_expenses,"transactions":grouped,"total_invested_amount": total_completed_amount,"all_transactions": transactions,"invested_project": project_wise_totals_list}  
