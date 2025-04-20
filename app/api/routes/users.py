@@ -189,7 +189,7 @@ def add_bank_details(data: AddBankAccountdRequest, user_data: dict = Depends(aut
         cursor = db.cursor(dictionary=True)
 
         insert_query = """
-                INSERT INTO Wallet (User_ID, Bank_Name, IFSC_Code, Account_Number)
+                INSERT INTO Bank_Details (User_ID, Bank_Name, IFSC_Code, Account_Number)
                 VALUES (%s, %s, %s, %s)
         """
         values = (data.User_ID, data.Bank_Name, data.IFSC_Code, data.Account_Number)

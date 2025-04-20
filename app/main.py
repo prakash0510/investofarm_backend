@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import users, notification, project, feedback, sent_email
+from app.api.routes import users, notification, project, feedback, sent_email, payment
 from fastapi.exceptions import RequestValidationError
 from app.schemas.user import validation_exception_handler
 
@@ -29,3 +29,4 @@ app.include_router(notification.router)
 app.include_router(project.router)
 app.include_router(feedback.router)
 app.include_router(sent_email.router)
+app.include_router(payment.router)
